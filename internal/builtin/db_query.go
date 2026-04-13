@@ -12,6 +12,10 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
+type dbPool interface {
+	BeginTx(ctx context.Context, txOptions pgx.TxOptions) (pgx.Tx, error)
+}
+
 type DBQueryToolConfig struct {
 	Pool *pgxpool.Pool
 }
@@ -21,7 +25,7 @@ func NewDBQueryTool(cfg DBQueryToolConfig) *DBQueryTool {
 }
 
 type DBQueryTool struct {
-	pool *pgxpool.Pool
+	pool dbPool
 }
 
 func (t *DBQueryTool) Name() string {

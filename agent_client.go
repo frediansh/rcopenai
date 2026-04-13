@@ -50,6 +50,10 @@ type AgentClientConfig struct {
 	// Optional callbacks for iteration status.
 	OnIterationWarning     func(current, max int)
 	OnMaxIterationsReached func(current, max int)
+
+	// ProviderOverride is used only for testing.
+	// If set, OpenAIToken and Provider fields are ignored.
+	ProviderOverride provider.Provider
 }
 
 type AgentClient struct {
@@ -77,9 +81,6 @@ type imageDescriber interface {
 
 func NewAgentClient(ctx context.Context, cfg AgentClientConfig) (*AgentClient, error) {
 	_ = ctx
-	if strings.TrimSpace(cfg.OpenAIToken) == "" {
-		return nil, errors.New("OpenAIToken is required")
-	}
 	if strings.TrimSpace(cfg.OpenAIModel) == "" {
 		cfg.OpenAIModel = defaultOpenAIModel
 	}
@@ -87,22 +88,29 @@ func NewAgentClient(ctx context.Context, cfg AgentClientConfig) (*AgentClient, e
 		cfg.MaxIterations = defaultMaxIterations
 	}
 
-	selectedProvider := normalizeProviderName(cfg.Provider)
-
 	var (
 		p   provider.Provider
 		err error
 	)
-	switch selectedProvider {
-	case ProviderOpenAIResponses:
-		p, err = openairesponses.New(cfg.OpenAIToken, cfg.OpenAIBaseURL)
-	case ProviderDeepSeekChat:
-		p, err = deepseekchat.New(cfg.OpenAIToken, cfg.OpenAIBaseURL)
-	default:
-		return nil, fmt.Errorf("unknown provider %q", cfg.Provider)
-	}
-	if err != nil {
-		return nil, fmt.Errorf("create provider %q: %w", selectedProvider, err)
+
+	if cfg.ProviderOverride != nil {
+		p = cfg.ProviderOverride
+	} else {
+		if strings.TrimSpace(cfg.OpenAIToken) == "" {
+			return nil, errors.New("OpenAIToken is required")
+		}
+		selectedProvider := normalizeProviderName(cfg.Provider)
+		switch selectedProvider {
+		case ProviderOpenAIResponses:
+			p, err = openairesponses.New(cfg.OpenAIToken, cfg.OpenAIBaseURL)
+		case ProviderDeepSeekChat:
+			p, err = deepseekchat.New(cfg.OpenAIToken, cfg.OpenAIBaseURL)
+		default:
+			return nil, fmt.Errorf("unknown provider %q", cfg.Provider)
+		}
+		if err != nil {
+			return nil, fmt.Errorf("create provider %q: %w", selectedProvider, err)
+		}
 	}
 
 	cb := cfg.Callback

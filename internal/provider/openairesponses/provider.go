@@ -18,8 +18,13 @@ import (
 	"github.com/openai/openai-go/v3/shared"
 )
 
+type responsesAPI interface {
+	New(ctx context.Context, body responses.ResponseNewParams, opts ...option.RequestOption) (*responses.Response, error)
+}
+
 type Provider struct {
 	client openai.Client
+	api    responsesAPI
 }
 
 func New(apiKey, baseURL string) (*Provider, error) {
@@ -33,7 +38,9 @@ func New(apiKey, baseURL string) (*Provider, error) {
 		opts = append(opts, option.WithBaseURL(strings.TrimSpace(baseURL)))
 	}
 	client := openai.NewClient(opts...)
-	return &Provider{client: client}, nil
+	p := &Provider{client: client}
+	p.api = &p.client.Responses
+	return p, nil
 }
 
 func (p *Provider) Close() error {
@@ -93,7 +100,7 @@ func (p *Provider) RunTurn(ctx context.Context, in provider.TurnInput) (provider
 		params.Input = responses.ResponseNewParamsInputUnion{OfInputItemList: items}
 	}
 
-	resp, err := p.client.Responses.New(ctx, params)
+	resp, err := p.api.New(ctx, params)
 	if err != nil {
 		return provider.TurnOutput{}, fmt.Errorf("responses.new: %w", err)
 	}
@@ -126,7 +133,7 @@ func (p *Provider) DescribeImage(ctx context.Context, model, instructions, promp
 		params.Instructions = openai.String(instructions)
 	}
 
-	resp, err := p.client.Responses.New(ctx, params)
+	resp, err := p.api.New(ctx, params)
 	if err != nil {
 		return provider.TurnOutput{}, fmt.Errorf("responses.new: %w", err)
 	}

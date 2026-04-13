@@ -12,8 +12,13 @@ import (
 	"github.com/openai/openai-go/v3/shared"
 )
 
+type chatCompletionsAPI interface {
+	New(ctx context.Context, body openai.ChatCompletionNewParams, opts ...option.RequestOption) (*openai.ChatCompletion, error)
+}
+
 type Provider struct {
 	client openai.Client
+	api    chatCompletionsAPI
 
 	mu       sync.Mutex
 	messages []openai.ChatCompletionMessageParamUnion
@@ -32,7 +37,9 @@ func New(apiKey, baseURL string) (*Provider, error) {
 	}
 
 	client := openai.NewClient(opts...)
-	return &Provider{client: client}, nil
+	p := &Provider{client: client}
+	p.api = &p.client.Chat.Completions
+	return p, nil
 }
 
 func (p *Provider) Close() error {
@@ -87,7 +94,7 @@ func (p *Provider) RunTurn(ctx context.Context, in provider.TurnInput) (provider
 		params.Tools = tools
 	}
 
-	resp, err := p.client.Chat.Completions.New(ctx, params)
+	resp, err := p.api.New(ctx, params)
 	if err != nil {
 		return provider.TurnOutput{}, fmt.Errorf("chat.completions.new: %w", err)
 	}
