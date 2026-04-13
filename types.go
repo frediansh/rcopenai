@@ -1,4 +1,4 @@
-package glopenai
+package rcopenai
 
 // Role represents a chat message role.
 type Role string

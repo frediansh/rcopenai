@@ -1,4 +1,4 @@
-package glopenai
+package rcopenai
 
 import (
 	"bytes"

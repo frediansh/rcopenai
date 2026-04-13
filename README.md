@@ -1,4 +1,4 @@
-# glopenai
+# rcopenai
 
 Library Go untuk agent LLM berbasis `openai-go/v3`, dengan target pengganti `glaichain` tanpa ketergantungan ke `langchaingo`.
 
@@ -12,7 +12,7 @@ module github.com/frediansh/rcopenai
 
 Rencana implementasi besar ada di:
 
-- `glopenai/PLAN.md`
+- `rcopenai/PLAN.md`
 
 Dokumen tersebut mencakup:
 
@@ -32,7 +32,7 @@ Yang sudah tersedia:
 - `MaxIterations`, warning callback, max-iteration callback
 - `TokenUsageHandler` untuk statistik token/call
 - built-in tools: `http-get`, `db-query`
-- sample CLI: `cmd/glopenai-sample/main.go`
+- sample CLI: `cmd/rcopenai-sample/main.go`
 
 ## Quickstart
 
@@ -48,7 +48,7 @@ import (
 )
 
 func main() {
-	client, err := glopenai.NewAgentClient(context.Background(), glopenai.AgentClientConfig{
+	client, err := rcopenai.NewAgentClient(context.Background(), rcopenai.AgentClientConfig{
 		OpenAIToken: os.Getenv("OPENAI_API_KEY"),
 		OpenAIModel: "gpt-5.3-codex",
 		SystemPrompt: "Kamu asisten data yang ringkas.",
@@ -69,5 +69,5 @@ func main() {
 Jalankan sample interaktif:
 
 ```bash
-go run ./cmd/glopenai-sample
+go run ./cmd/rcopenai-sample
 ```

@@ -77,7 +77,7 @@ func (t *HTTPGetTool) Call(ctx context.Context, input string) (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("http.NewRequest: %w", err)
 	}
-	req.Header.Set("User-Agent", "glopenai/http-get")
+	req.Header.Set("User-Agent", "rcopenai/http-get")
 	req.Header.Set("Accept", "*/*")
 
 	resp, err := t.client.Do(req)

@@ -34,9 +34,9 @@ func main() {
 		model = "gpt-4.1-mini"
 	}
 
-	tokenHandler := &glopenai.TokenUsageHandler{}
+	tokenHandler := &rcopenai.TokenUsageHandler{}
 
-	client, err := glopenai.NewAgentClient(ctx, glopenai.AgentClientConfig{
+	client, err := rcopenai.NewAgentClient(ctx, rcopenai.AgentClientConfig{
 		OpenAIToken: apiKey,
 		OpenAIModel: model,
 		Callback:    tokenHandler,
@@ -124,7 +124,7 @@ func normalizeJSONObject(s string) (map[string]string, error) {
 }
 
 func loadDotEnv() {
-	paths := []string{".env", "glopenai/.env"}
+	paths := []string{".env", "rcopenai/.env"}
 	for _, p := range paths {
 		if _, err := os.Stat(p); err == nil {
 			if err := godotenv.Load(p); err != nil {

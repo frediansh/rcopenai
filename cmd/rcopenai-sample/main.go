@@ -65,7 +65,7 @@ func main() {
 
 	httpClient := &http.Client{Timeout: 10 * time.Second}
 
-	toolList := make([]glopenai.Tool, 0, 2)
+	toolList := make([]rcopenai.Tool, 0, 2)
 	toolList = append(toolList, builtin.NewHTTPGetTool(builtin.HTTPGetToolConfig{
 		Client:   httpClient,
 		MaxBytes: builtin.DefaultHTTPGetMaxBodyBytes,
@@ -76,9 +76,9 @@ func main() {
 		}))
 	}
 
-	tokenHandler := &glopenai.TokenUsageHandler{}
+	tokenHandler := &rcopenai.TokenUsageHandler{}
 
-	client, err := glopenai.NewAgentClient(ctx, glopenai.AgentClientConfig{
+	client, err := rcopenai.NewAgentClient(ctx, rcopenai.AgentClientConfig{
 		OpenAIToken:               apiKey,
 		OpenAIModel:               openAIModel,
 		OpenAIBaseURL:             openAIBaseURL,
@@ -102,7 +102,7 @@ func main() {
 	}
 	defer client.Close()
 
-	fmt.Println("glopenai sample")
+	fmt.Println("rcopenai sample")
 	fmt.Println("- one-shot mode (tanpa input stream)")
 	fmt.Println()
 

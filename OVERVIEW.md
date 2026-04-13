@@ -1,6 +1,6 @@
-# OVERVIEW glopenai
+# OVERVIEW rcopenai
 
-`glopenai` adalah library helper Go untuk call OpenAI Responses API dengan pola agent loop (LLM + tool calling), mendukung:
+`rcopenai` adalah library helper Go untuk call OpenAI Responses API dengan pola agent loop (LLM + tool calling), mendukung:
 
 - `system prompt`
 - `human prompt`
@@ -88,7 +88,7 @@ Catatan penting:
 ### 4.2 `AgentClient`
 
 ```go
-client, err := glopenai.NewAgentClient(ctx, cfg)
+client, err := rcopenai.NewAgentClient(ctx, cfg)
 out, err := client.Chat(ctx, "...prompt...")
 client.Close()
 ```
@@ -184,7 +184,7 @@ import (
 )
 
 func main() {
-    client, err := glopenai.NewAgentClient(context.Background(), glopenai.AgentClientConfig{
+    client, err := rcopenai.NewAgentClient(context.Background(), rcopenai.AgentClientConfig{
         OpenAIToken: os.Getenv("OPENAI_API_KEY"),
         OpenAIModel: "gpt-5.3-codex",
         SystemPrompt: "Kamu asisten data yang ringkas.",
@@ -205,14 +205,14 @@ func main() {
 ### 6.2 Dengan history dan human template
 
 ```go
-cfg := glopenai.AgentClientConfig{
+cfg := rcopenai.AgentClientConfig{
     OpenAIToken: os.Getenv("OPENAI_API_KEY"),
     OpenAIModel: "gpt-5.3-codex",
     SystemPrompt: "Jawab bahasa Indonesia.",
     HumanPromptTemplate: "[USER_REQUEST]\n{{.Input}}\n[/USER_REQUEST]",
-    InitialHistory: []glopenai.ChatMessage{
-        {Role: glopenai.RoleUser, Content: "Halo"},
-        {Role: glopenai.RoleAssistant, Content: "Halo, saya siap bantu."},
+    InitialHistory: []rcopenai.ChatMessage{
+        {Role: rcopenai.RoleUser, Content: "Halo"},
+        {Role: rcopenai.RoleAssistant, Content: "Halo, saya siap bantu."},
     },
 }
 ```
@@ -238,10 +238,10 @@ func (EchoTool) Call(ctx context.Context, argumentsJSON string) (string, error) 
     return argumentsJSON, nil
 }
 
-client, _ := glopenai.NewAgentClient(ctx, glopenai.AgentClientConfig{
+client, _ := rcopenai.NewAgentClient(ctx, rcopenai.AgentClientConfig{
     OpenAIToken: os.Getenv("OPENAI_API_KEY"),
     OpenAIModel: "gpt-5.3-codex",
-    Tools: []glopenai.Tool{EchoTool{}},
+    Tools: []rcopenai.Tool{EchoTool{}},
 })
 ```
 
@@ -288,9 +288,9 @@ Output: JSON array maksimal 20 row.
 
 ```go
 httpClient := &http.Client{Timeout: 10 * time.Second}
-tokenHandler := &glopenai.TokenUsageHandler{}
+tokenHandler := &rcopenai.TokenUsageHandler{}
 
-tools := []glopenai.Tool{
+tools := []rcopenai.Tool{
     builtin.NewHTTPGetTool(builtin.HTTPGetToolConfig{
         Client:   httpClient,
         MaxBytes: builtin.DefaultHTTPGetMaxBodyBytes,
@@ -298,7 +298,7 @@ tools := []glopenai.Tool{
     builtin.NewDBQueryTool(builtin.DBQueryToolConfig{Pool: dbPool}),
 }
 
-client, err := glopenai.NewAgentClient(ctx, glopenai.AgentClientConfig{
+client, err := rcopenai.NewAgentClient(ctx, rcopenai.AgentClientConfig{
     OpenAIToken:  os.Getenv("OPENAI_API_KEY"),
     OpenAIModel:  "gpt-5.3-codex",
     SystemPrompt: "Kamu asisten data yang ringkas.",
@@ -364,9 +364,9 @@ Catatan:
 `TokenUsageHandler` sudah disediakan:
 
 ```go
-tokenHandler := &glopenai.TokenUsageHandler{}
+tokenHandler := &rcopenai.TokenUsageHandler{}
 
-client, _ := glopenai.NewAgentClient(ctx, glopenai.AgentClientConfig{
+client, _ := rcopenai.NewAgentClient(ctx, rcopenai.AgentClientConfig{
     OpenAIToken: os.Getenv("OPENAI_API_KEY"),
     OpenAIModel: "gpt-5.3-codex",
     Callback: tokenHandler,
@@ -461,4 +461,4 @@ go test -race ./...
 - Tool contract: `tool.go`
 - OpenAI provider: `internal/provider/openairesponses/provider.go`
 - Built-in tools: `internal/builtin/http_get.go`, `internal/builtin/db_query.go`
-- Sample app: `cmd/glopenai-sample/main.go`
+- Sample app: `cmd/rcopenai-sample/main.go`
